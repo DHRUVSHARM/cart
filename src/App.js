@@ -1,6 +1,12 @@
+import { FirebaseError } from "firebase/app";
 import React from "react";
 import Cart from "./Cart";
 import Navbar from "./Navbar";
+import firebase from 'firebase/compat/app';
+import firestore from 'firebase/compat/firestore';
+
+//import { fireEvent } from "@testing-library/react";
+
 
 class App extends React.Component {
 
@@ -9,74 +15,43 @@ class App extends React.Component {
 
     this.state = {
 
-        products : [
-            {
-                price : 99,
-                title : 'Watch',
-                qty : 1,
-                img : 'https://images.unsplash.com/photo-1542496658-e33a6d0d50f6?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=870&q=80',
-                id : 1
-            },
-            {
-                price : 999,
-                title : 'Mobile Phone',
-                qty : 10,
-                img : 'https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=580&q=80',
-                id: 2
-            },
-            {
-                price : 9999,
-                title : 'Laptop',
-                qty : 46,
-                img : 'https://images.unsplash.com/photo-1611186871348-b1ce696e52c9?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=870&q=80',
-                id: 3
-            },
-            {
-                price : 45,
-                title : 'Apple',
-                qty : 10,
-                img : 'https://images.unsplash.com/photo-1560806887-1e4cd0b6cbd6?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=774&q=80',
-                id: 4
-            },
-            {
-                price : 34,
-                title : 'Mango',
-                qty : 10,
-                img : 'https://media.istockphoto.com/id/157234956/photo/mango-two.jpg?s=1024x1024&w=is&k=20&c=yZydrE30c3c6ev-tMQPYQziu3k3BEuimCHBBVZhsJv8=',
-                id: 5
-            },
-            {
-                price : 33,
-                title : 'Pear',
-                qty : 10,
-                img : 'https://images.unsplash.com/photo-1601876819102-99560f772713?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=387&q=80',
-                id: 6
-            },
-            {
-                price : 9,
-                title : 'Notebook',
-                qty : 10,
-                img : 'https://images.unsplash.com/photo-1581431886211-6b932f8367f2?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=870&q=80',
-                id: 7
-            },
-            {
-                price : 20,
-                title : 'Pen',
-                qty : 10,
-                img : 'https://images.unsplash.com/photo-1585336261022-680e295ce3fe?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=870&q=80',
-                id: 8
-            },
-            {
-                price : 1000,
-                title : 'Headphones',
-                qty : 10,
-                img : 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?ixlib=rb-4.0.3&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=870&q=80',
-                id: 9
-            }
-
-        ]
-
+        loading : true,
+        //used for displaying the loading message 
+        products : []
+        //stores the products in the cart
     }
+
+    this.db = firebase.firestore()
+}
+
+componentDidMount(){
+
+    //we attach a listener that will update the component state whenever 
+    //we edit fields in the firebase db
+        this.db
+            .collection('products')
+            .onSnapshot((snapshot) => {
+                console.log("snap " , snapshot)
+            
+                /*snapshot.docs.map((doc) => {
+                    console.log(doc.data());
+                })*/
+    
+               const products = snapshot.docs.map((doc) => {
+                    const data = doc.data();
+                    data['id'] = doc.id;
+    
+                    return data;
+                });
+    
+                this.setState({
+    
+                    products : products,
+                    loading : false
+            })
+            
+        
+})
 
 }
 
@@ -85,7 +60,7 @@ handleIncreaseQuantity = (product) => {
     //we will have to find the product that has to be modified 
     const {products} = this.state;
     const index = products.indexOf(product);
-
+/*
     //change the qty of the product
     products[index].qty += 1;
 
@@ -95,27 +70,54 @@ handleIncreaseQuantity = (product) => {
             product : product
         }
     )
-    
+*/  
+    //now we will increase qty in firebase db
+    //we get the document reference using the unique id of the product
+    const docRef = this.db.collection('products').doc(products[index].id);
+    //we use the reference obtained for updates
+    docRef
+        .update({
+            qty : products[index].qty + 1
+        })
+        .then(() => {
+            console.log("Update succesfull !!!")
+        }).catch((error) => {
+            console.log("Update error : " , error)
+        })
 }
 
 handleDecreaseQuantity = (product) => {
     const{products} = this.state
     const index = products.indexOf(product);
 
-    if(products[index].qty > 0){
+  /*  if(products[index].qty > 0){
         products[index].qty -= 1;
         this.setState(
             {
                 product : product
             }
         )   
+    }*/
+
+    if(products[index].qty > 0){
+        const docRef = this.db.collection('products').doc(products[index].id);
+        //we use the reference obtained for updates
+        docRef
+            .update({
+                qty : products[index].qty - 1
+            })
+            .then(() => {
+                console.log("Update succesfull !!!")
+            }).catch((error) => {
+                console.log("Update error : " , error)
+            })
     }
 }
 
 handleDeleteProduct = (id) => {
     const {products} = this.state;
 
-    //getting an array of all objects that do not have the passed id
+    /*//getting an array of all objects that do not have the passed id
     const items = products.filter(  
         (item) => {
             return item.id !== id
@@ -127,7 +129,16 @@ handleDeleteProduct = (id) => {
         {
             products : items
         }
-    )
+    )*/
+    
+    const docRef = this.db.collection('products').doc(id);
+    docRef
+    .delete()
+    .then(() => {
+        console.log("Deletion succesfull !!!")
+    }).catch((error) => {
+        console.log("Deletion error : " , error)
+    })
 }
 
 getCartCount = () => {
@@ -155,16 +166,101 @@ getCartTotal = () => {
   return cartTotal;
 }
 
+addProduct = () => {
+    this.db
+        .collection('products')
+        .add({
+            img : '',
+            price : 1,
+            qty : 1,
+            title : 'Default Product'
+        }).then((docRef) => {
+            console.log("Reference of document added: " , docRef)
+        }).catch((error) => {
+            console.log("error is: " , error)
+        })
+}
+
+orderByPrice = () => {
+    console.log("ordering by price !!!!")
+    this.db
+    .collection('products')
+    .orderBy('price')
+    .onSnapshot((snapshot) => {
+        console.log("snap " , snapshot)
+    
+        /*snapshot.docs.map((doc) => {
+            console.log(doc.data());
+        })*/
+
+       const products = snapshot.docs.map((doc) => {
+            const data = doc.data();
+            data['id'] = doc.id;
+
+            return data;
+        });
+
+        this.setState({
+
+            products : products
+    })
+})
+
+}
+
+orderByQuantity = () => {
+    console.log("ordering by qty !!!!!!")
+    this.db
+    .collection('products')
+    .orderBy('qty')
+    .onSnapshot((snapshot) => {
+        console.log("snap " , snapshot)
+    
+        /*snapshot.docs.map((doc) => {
+            console.log(doc.data());
+        })*/
+
+       const products = snapshot.docs.map((doc) => {
+            const data = doc.data();
+            data['id'] = doc.id;
+
+            return data;
+        });
+
+        this.setState({
+
+            products : products
+    })
+})
+}
+
     render(){
 
-      const{products} = this.state;
+      const{products , loading} = this.state;
 
       return (
         <div className="App">
           <Navbar
             count = {this.getCartCount()}
           />
+          <div className="actions">
           
+          <button 
+          onClick={this.addProduct}>
+                Add a default product
+            </button>
+
+            <button 
+          onClick={this.orderByPrice}>
+                Order by Item price
+            </button>
+
+            <button 
+          onClick={this.orderByQuantity}>
+                Order by Item quantity
+            </button>
+
+            </div>
           <Cart
             productArray = {products}
             onIncreaseQuantity = {this.handleIncreaseQuantity}
@@ -172,6 +268,8 @@ getCartTotal = () => {
             onDeleteProduct = {this.handleDeleteProduct}
           />
 
+          {loading && <h1>Loading Products.....</h1>}
+        
           <div className="footer">TOTAL: {this.getCartTotal()} USD</div>
 
         </div>

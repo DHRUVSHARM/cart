@@ -7,6 +7,21 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+.actions{
+  background-color: darkblue;
+}
+
+.actions button{
+  background: rgb(66, 103, 178);
+  color: black;
+  padding: 12px 24px;
+  border: 2px solid black;
+  cursor: pointer;
+  font-size: larger;
+  border-radius: 4px;
+  font-weight: 900;
+}
+
 
 .cart-item {
     display: inline-flex;
