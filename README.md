@@ -1,12 +1,14 @@
 Final React shopping cart with firebase as a db with adding, updating, deleting and order by field functionality
-Below is the video that displays all this functionality and design:
+Below is the link to the video that displays all the functionality and design:
 
 [![Shopping Cart Demo](https://www.youtube.com/watch?v=9OZ4K2wz864)](https://www.youtube.com/watch?v=9OZ4K2wz864)
 
 Below is the final React based design of the shopping cart app:
 the total qty icon at the top right and the total price at the bottom are dynamic components and we have the functionality to 
 change qty and remove items from cart, while the total price and qty sections get updated dynamically.
-<img width="948" alt="image" src="https://user-images.githubusercontent.com/88125615/212636491-66fd10f0-b421-4936-a766-3779bb768e96.png">
+
+<img width="945" alt="shopping_design" src="https://user-images.githubusercontent.com/88125615/213610676-cfabbe62-2647-4e3b-b22c-89dbe79ca21a.png">
+
 
 # Getting Started with Create React App
 
