@@ -68,3 +68,9 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+Below is the final React based design of the shopping cart app:
+the total qty icon at the top right and the total price at the bottom are dynamic components and we have the functionality to 
+change qty and remove items from cart, while the total price and qty sections get updated dynamically.
+<img width="948" alt="image" src="https://user-images.githubusercontent.com/88125615/212636491-66fd10f0-b421-4936-a766-3779bb768e96.png">
+
